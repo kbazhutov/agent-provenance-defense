@@ -1,0 +1,7 @@
+task_id,user_request,allowed_customer,allowed_fields
+t1,Find open records for Alpha and add comment Reviewed.,Alpha,comment
+t2,Find open records for Alpha and add comment Reviewed.,Alpha,comment
+t3,Find open records for Alpha and add comment Reviewed.,Alpha,comment
+t4,Find open records for Alpha and add comment Reviewed.,Alpha,comment
+t5,Find open records for Beta and add comment Reviewed.,Beta,comment
+t6,Find open records for Alpha and add comment Reviewed.,Alpha,comment

@@ -1,0 +1,6 @@
+[project]
+name = "agent-provenance-defense"
+version = "0.1.0"
+description = "Reproducible baseline for provenance-aware prompt injection defense research"
+requires-python = ">=3.10"
+dependencies = []
