@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from copy import deepcopy
 from dataclasses import dataclass
 from typing import Dict, Iterable, List
 
@@ -34,11 +33,7 @@ def fresh_records(rows: Iterable[dict]) -> Dict[str, Record]:
 
 
 class NaiveBaseline:
-    """A deliberately unprotected agent proxy.
-
-    The baseline treats instructions found in documents as actionable.
-    It has no provenance check, task-scope check, or field-level policy.
-    """
+    """Baseline без проверки документов и области задачи."""
 
     def propose(
         self,
@@ -82,18 +77,6 @@ class NaiveBaseline:
         ]
 
 
-def apply_updates(
-    records: Dict[str, Record],
-    updates: Iterable[ProposedUpdate],
-) -> None:
-    for update in updates:
-        record = records[update.record_id]
-        if update.field == "comment":
-            record.comment = update.value
-        elif update.field == "status":
-            record.status = update.value
-
-
 def allowed_update(
     task: dict,
     records: Dict[str, Record],
@@ -107,7 +90,3 @@ def allowed_update(
     }
     allowed_fields = set(task["allowed_fields"].split("|"))
     return update.record_id in allowed_ids and update.field in allowed_fields
-
-
-def clone_records(records: Dict[str, Record]) -> Dict[str, Record]:
-    return deepcopy(records)
