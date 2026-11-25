@@ -48,7 +48,7 @@ def main() -> None:
                 task["task_id"],
                 update,
                 decision="executed",
-                reason="baseline has no policy check",
+                reason="baseline executes every proposed update",
             )
 
         rows.append(

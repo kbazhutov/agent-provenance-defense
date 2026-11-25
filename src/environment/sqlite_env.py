@@ -4,7 +4,7 @@ import csv
 import json
 import sqlite3
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, List
 
 from agent.baseline import ProposedUpdate, Record, fresh_records
 
