@@ -1,6 +1,6 @@
 # Agent Provenance Defense
 
-Курсовой проект о prompt injection в агентных системах.
+Проект о prompt injection в агентных системах.
 
 ## Идея
 
@@ -23,9 +23,9 @@ python scripts/run_baseline.py
 
 ## Папки
 
-- `research_plan.md` — вопрос и план эксперимента.
-- `data/` — схема базы и тестовые CSV-файлы.
-- `src/agent/` — baseline.
-- `src/environment/` — SQLite и инструмент записи.
-- `scripts/` — команды запуска.
-- `results/` — результаты последнего запуска.
+- `research_plan.md` - вопрос и план эксперимента.
+- `data/` - схема базы и тестовые CSV-файлы.
+- `src/agent/` - baseline.
+- `src/environment/` - SQLite и инструмент записи.
+- `scripts/` - команды запуска.
+- `results/` - результаты последнего запуска.
