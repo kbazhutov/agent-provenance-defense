@@ -4,47 +4,64 @@ import csv
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List
+from typing import List
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent.baseline import NaiveBaseline, allowed_update, apply_updates, fresh_records
-
-
-def read_csv(path: Path) -> List[dict]:
-    with path.open("r", encoding="utf-8", newline="") as stream:
-        return list(csv.DictReader(stream))
+from agent.baseline import NaiveBaseline, allowed_update
+from environment.sqlite_env import (
+    initialize_database,
+    load_documents,
+    load_records,
+    load_tasks,
+    update_record,
+)
 
 
 def main() -> None:
-    records_rows = read_csv(ROOT / "data" / "records.csv")
-    tasks = read_csv(ROOT / "data" / "tasks.csv")
-    documents = read_csv(ROOT / "data" / "documents.csv")
     agent = NaiveBaseline()
     rows: List[dict] = []
 
-    for task in tasks:
-        records = fresh_records(records_rows)
-        task_documents = [
-            document for document in documents if document["task_id"] == task["task_id"]
-        ]
-        updates = agent.propose(task, task_documents, records)
+    for task_seed in _read_csv(ROOT / "data" / "tasks.csv"):
+        connection = initialize_database(
+            ":memory:",
+            ROOT / "data" / "schema.sql",
+            ROOT / "data" / "records.csv",
+            ROOT / "data" / "documents.csv",
+            ROOT / "data" / "tasks.csv",
+        )
+        task = next(
+            item
+            for item in load_tasks(connection)
+            if item["task_id"] == task_seed["task_id"]
+        )
+        records = load_records(connection)
+        documents = load_documents(connection, task["task_id"])
+        updates = agent.propose(task, documents, records)
         allowed = sum(allowed_update(task, records, update) for update in updates)
         unauthorized = len(updates) - allowed
 
-        apply_updates(records, updates)
+        for update in updates:
+            update_record(
+                connection,
+                task["task_id"],
+                update,
+                decision="executed",
+                reason="baseline has no policy check",
+            )
 
         rows.append(
             {
                 "task_id": task["task_id"],
-                "document_ids": "|".join(document["id"] for document in task_documents),
+                "document_ids": "|".join(document["id"] for document in documents),
                 "proposed_updates": len(updates),
                 "allowed_updates": allowed,
                 "unauthorized_updates": unauthorized,
                 "attack_success": int(unauthorized > 0),
             }
         )
+        connection.close()
 
     results_dir = ROOT / "results"
     results_dir.mkdir(exist_ok=True)
@@ -66,6 +83,11 @@ def main() -> None:
     print(f"Proposed updates: {total_updates}")
     print(f"Unauthorized updates: {total_unauthorized}")
     print(f"Scenarios with an unauthorized action: {attack_cases}")
+
+
+def _read_csv(path: Path) -> List[dict]:
+    with path.open("r", encoding="utf-8", newline="") as stream:
+        return list(csv.DictReader(stream))
 
 
 if __name__ == "__main__":
